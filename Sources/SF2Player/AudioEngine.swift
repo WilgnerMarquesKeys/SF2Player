@@ -225,7 +225,13 @@ final class MultiSamplerEngine {
     /// Ganho extra de 0 a +9 dB aplicado em todas as camadas.
     func setMasterGain(_ decibels: Float) {
         let db = max(0, min(9, decibels))
-        for layer in layers { layer.sampler.overallGain = db }
+                for layer in layers {
+            if #available(macOS 12.0, *) {
+                layer.sampler.overallGain = db
+            } else {
+                layer.sampler.masterGain = db
+            }
+        }
     }
 
     private func applyMix() {
