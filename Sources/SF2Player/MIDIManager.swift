@@ -5,10 +5,11 @@ import Foundation
 /// Os callbacks on* são chamados na thread do CoreMIDI.
 final class MIDIManager {
 
-    var onNoteOn: ((UInt8, UInt8) -> Void)?
-    var onNoteOff: ((UInt8) -> Void)?
-    var onControlChange: ((UInt8, UInt8) -> Void)?
-    var onPitchBend: ((UInt16) -> Void)?
+    // Todos os callbacks recebem o canal MIDI (1–16) como primeiro argumento.
+    var onNoteOn: ((Int, UInt8, UInt8) -> Void)?
+    var onNoteOff: ((Int, UInt8) -> Void)?
+    var onControlChange: ((Int, UInt8, UInt8) -> Void)?
+    var onPitchBend: ((Int, UInt16) -> Void)?
     var onDevicesChanged: (([String]) -> Void)?
 
     private var client = MIDIClientRef()
@@ -118,6 +119,7 @@ final class MIDIManager {
             }
 
             let kind = status & 0xF0
+            let channel = Int(status & 0x0F) + 1
             let dataLength = (kind == 0xC0 || kind == 0xD0) ? 1 : 2
             guard i + dataLength < n else { break }
 
@@ -127,13 +129,13 @@ final class MIDIManager {
 
             switch kind {
             case 0x90:
-                if d2 > 0 { onNoteOn?(d1, d2) } else { onNoteOff?(d1) }
+                if d2 > 0 { onNoteOn?(channel, d1, d2) } else { onNoteOff?(channel, d1) }
             case 0x80:
-                onNoteOff?(d1)
+                onNoteOff?(channel, d1)
             case 0xB0:
-                onControlChange?(d1, d2)
+                onControlChange?(channel, d1, d2)
             case 0xE0:
-                onPitchBend?(UInt16(d1) | (UInt16(d2) << 7))
+                onPitchBend?(channel, UInt16(d1) | (UInt16(d2) << 7))
             default:
                 break
             }

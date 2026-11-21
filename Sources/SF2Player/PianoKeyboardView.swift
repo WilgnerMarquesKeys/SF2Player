@@ -98,18 +98,18 @@ final class PianoKeyboardView: NSView {
     // MARK: - Desenho
 
     override func draw(_ dirtyRect: NSRect) {
-        NSColor(calibratedWhite: 0.12, alpha: 1).setFill()
+        Theme.dark.setFill()
         bounds.fill()
 
-        let accent = NSColor.controlAccentColor
+        let accent = Theme.accent
         let whiteLit = accent.blended(withFraction: 0.35, of: .white) ?? accent
 
         for note in firstNote...lastNote where !isBlack(note) {
             let r = rect(for: note).insetBy(dx: 0.5, dy: 0.5)
             let path = NSBezierPath(roundedRect: r, xRadius: 3, yRadius: 3)
-            (litNotes.contains(note) ? whiteLit : NSColor.white).setFill()
+            (litNotes.contains(note) ? whiteLit : Theme.text).setFill()
             path.fill()
-            NSColor(calibratedWhite: 0.55, alpha: 1).setStroke()
+            Theme.silverDim.setStroke()
             path.lineWidth = 1
             path.stroke()
 
@@ -126,7 +126,7 @@ final class PianoKeyboardView: NSView {
         for note in firstNote...lastNote where isBlack(note) {
             let r = rect(for: note)
             let path = NSBezierPath(roundedRect: r, xRadius: 2, yRadius: 2)
-            (litNotes.contains(note) ? accent : NSColor(calibratedWhite: 0.07, alpha: 1)).setFill()
+            (litNotes.contains(note) ? accent : Theme.rgb(0x08141F)).setFill()
             path.fill()
         }
     }
