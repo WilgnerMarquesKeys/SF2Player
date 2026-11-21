@@ -3,12 +3,12 @@
 #
 # Variáveis opcionais:
 #   ARCHS="x86_64"            só Intel     (padrão: "x86_64 arm64" = Universal)
-#   SANDBOX=0                 assina sem App Sandbox (padrão: 1 = com sandbox)
+#   SANDBOX=1                 assina com App Sandbox (padrão: 0 = sem sandbox, para lembrar os .sf2)
 set -euo pipefail
 
 APP_NAME="SF2Player"
 ARCHS="${ARCHS:-x86_64 arm64}"
-SANDBOX="${SANDBOX:-1}"
+SANDBOX="${SANDBOX:-0}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$ROOT/build"
