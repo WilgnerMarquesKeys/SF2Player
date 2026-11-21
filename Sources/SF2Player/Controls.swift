@@ -8,6 +8,10 @@ final class FaderView: NSView {
     }
     var defaultValue: Double = 0.8
     var onChange: ((Double) -> Void)?
+    var learnState: LearnState = .off {
+        didSet { if learnState != oldValue { needsDisplay = true } }
+    }
+    var onLearnClick: (() -> Void)?
 
     private let knobSize = NSSize(width: 34, height: 20)
 
@@ -61,6 +65,8 @@ final class FaderView: NSView {
         path.stroke()
         Theme.accent.setFill()
         NSRect(x: knob.minX + 6, y: knob.midY - 1, width: knob.width - 12, height: 2).fill()
+
+        drawLearnOutline(learnState, in: bounds, cornerRadius: 8)
     }
 
     private func update(from event: NSEvent) {
@@ -73,6 +79,10 @@ final class FaderView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if learnState != .off {
+            onLearnClick?()
+            return
+        }
         if event.clickCount == 2 {
             value = defaultValue
             onChange?(defaultValue)
@@ -82,6 +92,7 @@ final class FaderView: NSView {
     }
 
     override func mouseDragged(with event: NSEvent) {
+        if learnState != .off { return }
         update(from: event)
     }
 }
@@ -95,6 +106,10 @@ final class KnobView: NSView {
     var defaultValue: Double = 0.5
     var isBipolar = false { didSet { needsDisplay = true } }
     var onChange: ((Double) -> Void)?
+    var learnState: LearnState = .off {
+        didSet { if learnState != oldValue { needsDisplay = true } }
+    }
+    var onLearnClick: (() -> Void)?
 
     private var dragStartY: CGFloat = 0
     private var dragStartValue: Double = 0
@@ -151,9 +166,15 @@ final class KnobView: NSView {
         pointer.lineCapStyle = .round
         Theme.accent.setStroke()
         pointer.stroke()
+
+        drawLearnOutline(learnState, in: bounds, cornerRadius: side / 2)
     }
 
     override func mouseDown(with event: NSEvent) {
+        if learnState != .off {
+            onLearnClick?()
+            return
+        }
         if event.clickCount == 2 {
             value = defaultValue
             onChange?(defaultValue)
@@ -164,6 +185,7 @@ final class KnobView: NSView {
     }
 
     override func mouseDragged(with event: NSEvent) {
+        if learnState != .off { return }
         let delta = Double(event.locationInWindow.y - dragStartY) / 150.0
         let newValue = min(1, max(0, dragStartValue + delta))
         value = newValue
@@ -187,6 +209,10 @@ final class ToggleButton: NSView {
     }
     var onToggle: ((Bool) -> Void)?
     var onClick: (() -> Void)?
+    var learnState: LearnState = .off {
+        didSet { if learnState != oldValue { needsDisplay = true } }
+    }
+    var onLearnClick: (() -> Void)?
 
     private var pressed = false { didSet { needsDisplay = true } }
 
@@ -222,13 +248,20 @@ final class ToggleButton: NSView {
         let size = text.size(withAttributes: attributes)
         text.draw(at: NSPoint(x: bounds.midX - size.width / 2, y: bounds.midY - size.height / 2),
                   withAttributes: attributes)
+
+        drawLearnOutline(learnState, in: bounds, cornerRadius: 6)
     }
 
     override func mouseDown(with event: NSEvent) {
+        if learnState != .off {
+            onLearnClick?()
+            return
+        }
         pressed = true
     }
 
     override func mouseUp(with event: NSEvent) {
+        if learnState != .off { return }
         let point = convert(event.locationInWindow, from: nil)
         let inside = bounds.contains(point)
         pressed = false

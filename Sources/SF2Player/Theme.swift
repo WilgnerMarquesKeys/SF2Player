@@ -64,3 +64,33 @@ class PanelView: NSView {
         path.stroke()
     }
 }
+
+// MARK: - MIDI Learn (contorno nos controles)
+
+enum LearnState {
+    case off        // modo Learn desligado
+    case available  // dá para mapear
+    case mapped     // já tem um controle MIDI atribuído
+    case armed      // esperando você mexer no controle do teclado
+}
+
+func drawLearnOutline(_ state: LearnState, in rect: NSRect, cornerRadius: CGFloat = 6) {
+    var color = Theme.cyan
+    var width: CGFloat = 1.5
+    switch state {
+    case .off:
+        return
+    case .available:
+        color = Theme.textDim.withAlphaComponent(0.8)
+    case .mapped:
+        color = Theme.cyan
+    case .armed:
+        color = Theme.warn
+        width = 3
+    }
+    let path = NSBezierPath(roundedRect: rect.insetBy(dx: width / 2, dy: width / 2),
+                            xRadius: cornerRadius, yRadius: cornerRadius)
+    color.setStroke()
+    path.lineWidth = width
+    path.stroke()
+}

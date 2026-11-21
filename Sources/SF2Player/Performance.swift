@@ -15,6 +15,8 @@ struct LayerState: Codable {
     var channel: Int = 0          // 0 = Omni, 1...16
     var transpose: Int = 0        // semitons
     var reverb: Double = 0        // 0...1
+    var reverbType: Int? = nil    // 0...6 (padrão: 4 = Hall grande)
+    var title: String? = nil      // ex.: "GRAVE", "AGUDO"
 }
 
 /// Uma "performance" completa: todas as camadas + master.
